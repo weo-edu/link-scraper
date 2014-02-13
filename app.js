@@ -2,7 +2,7 @@ var express = require('express')
   , cheerio = require('cheerio')
   , request = require('superagent')
   , _ = require('lodash')
-  , app = express();
+  , app = module.exports = express();
 
 app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
