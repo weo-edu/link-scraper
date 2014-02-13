@@ -45,9 +45,15 @@ function normalize(url, protocol) {
 }
 
 app.get('/', function(req, res) {
+  function fail() {
+    res.json(404, {error: 'Failed to fetch url'});
+  }
+
   var url = normalize(req.param('url'));
+  if(! url) return fail();
+
   retrieve(url, function(err, response) {
-    if(err) return res.send(err);
+    if(err || response.status !== 200) return fail();
 
     var parts = response.type.split('/')
       , data = {title: url, url: url, content: parts[0]};
