@@ -2,6 +2,7 @@ var express = require('express')
   , cheerio = require('cheerio')
   , request = require('superagent')
   , _ = require('lodash')
+  , cors = require('cors')
   , app = module.exports = express();
 
 app.configure('development', function(){
@@ -11,6 +12,8 @@ app.configure('development', function(){
 app.configure('production', function(){
     app.use(express.errorHandler());
 });
+
+app.use(cors());
 
 
 function parse(html, url) {
