@@ -72,4 +72,6 @@ app.get('/', function(req, res) {
   });
 });
 
-app.listen(process.env.PORT || 5000);
+var port = process.env.PORT || 5000;
+app.listen(port);
+console.log('listening on port', port);
