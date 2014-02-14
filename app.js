@@ -6,28 +6,58 @@ var express = require('express')
   , app = module.exports = express();
 
 app.configure('development', function(){
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function(){
-    app.use(express.errorHandler());
+  app.use(express.errorHandler());
 });
 
 app.use(cors());
 
+var parsers = [
+  function openGraph($, data, url) {
+    $('meta[property^=og]').each(function(i, el) {
+      data[el.attribs.property] = el.attribs.content;
+    });
+  },
+  function meta($, data, url) {
+    $('meta[itemprop]').each(function(i, el) {
+      data['meta:' + el.attribs.itemprop] = el.attribs.content;
+    });
+  },
+  function firstImgTag($, data, url) {
+    data.firstImage = $('img').eq(0).attr('src');
+  },
+  function titleTag($, data, url) {
+    data.titleTag = $('title').text();
+  }
+];
 
-function parse(html, url) {
+var transforms = [
+  function(data, url) {
+    data.image = data['og:image'] || data['meta:image'] || data.firstImage;
+  },
+  function(data, url) {
+    data.title = data['og:title'] || data.titleTag;
+  },
+  function(data, url) {
+    data.image = require('url').resolve(url, data.image);
+  }
+];
+
+function parse(html, url, cb) {
   var $ = cheerio.load(html)
     , data = {};
 
-  $('meta[property^=og]').each(function(i, el) {
-    data[el.attribs.property] = el.attribs.content;
+  _.each(parsers, function(fn) {
+    fn($, data, url);
   });
 
-  data.title = data['og:title'] || $('title').text();
-  data.image = data['og:image'] || $('img').eq(0).attr('src');
-  if(data.image)
-    data.image = require('url').resolve(url, data.image);
+  _.each(transforms, function(fn) {
+    fn(data, url);
+  });
+
   return data;
 }
 
