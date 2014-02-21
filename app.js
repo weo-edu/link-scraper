@@ -63,8 +63,8 @@ function parse(html, url, cb) {
 
 function retrieve(url, cb) {
   request
-    .set('user-agent', 'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0')
     .get(url)
+    .set('user-agent', 'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0')
     .end(function(err, res) {
       if(err) return cb(err, null);
       cb(null, res);
