@@ -17,14 +17,21 @@ app.use(cors());
 
 var parsers = [
   function openGraph($, data, url) {
+    var og = {};
     $('meta[property^=og]').each(function(i, el) {
-      data[el.attribs.property] = el.attribs.content;
+      og[el.attribs.property.slice(3)] = el.attribs.content;
     });
+    data.og = og;
   },
   function meta($, data, url) {
-    $('meta[itemprop]').each(function(i, el) {
-      data['meta:' + el.attribs.itemprop] = el.attribs.content;
+    var meta = {};
+    $('meta[name]').each(function(i, el) {
+      meta[el.attribs.name] = el.attribs.content;
     });
+    data.meta = meta;
+  },
+  function schema($, data, url) {
+    data.schema = require('schema-microdata')($);
   },
   function firstImgTag($, data, url) {
     data.firstImage = $('img').eq(0).attr('src');
