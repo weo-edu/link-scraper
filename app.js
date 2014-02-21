@@ -78,6 +78,7 @@ function normalize(url, protocol) {
 }
 
 app.get('/', function(req, res) {
+  console.log('req', req.headers);
   function fail() {
     res.json(404, {error: 'Failed to fetch url'});
   }
